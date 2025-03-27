@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = "ball_tracker"
@@ -9,15 +11,18 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
-        ("share/ball_tracker/launch", ["launch/camera.launch.py"]),
-        ("share/ball_tracker/launch", ["launch/sim_cam.launch.py"]),
-        ("share/ball_tracker/launch", ["launch/follow_ball.launch.py"]),
+        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
+        (os.path.join("share", package_name, "config"), glob("config/*.yaml")),
+        (
+            os.path.join("share", package_name, "config/Vocabulary"),
+            glob("config/Vocabulary/*.txt"),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="peyton",
     maintainer_email="peyton0330@gmail.com",
-    description="TODO: Package description",
+    description="Ball tracking and following system using ROS2 with ORB-SLAM3",
     license="Apache-2.0",
     tests_require=["pytest"],
     entry_points={

@@ -4,18 +4,19 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 
-
 class ImageSubscriber(Node):
     def __init__(self):
-        super().__init__("image_subscriber")
-
+        super().__init__('image_subscriber')
+        
         # Get parameter with proper type handling
-        self.declare_parameter("image_topic", "/camera/image_raw")
-        topic = self.get_parameter("image_topic").get_parameter_value().string_value
-
+        self.declare_parameter('image_topic', '/camera/image_raw')
+        topic = self.get_parameter('image_topic').get_parameter_value().string_value
+        
         self.subscription = self.create_subscription(
-            Image, topic, self.listener_callback, 10
-        )
+            Image,
+            topic,
+            self.listener_callback,
+            10)
         self.bridge = CvBridge()
         self.get_logger().info(f"Subscribed to: {topic}")
 
@@ -32,7 +33,6 @@ class ImageSubscriber(Node):
         except Exception as e:
             self.get_logger().error(f"Processing error: {str(e)}")
 
-
 def main(args=None):
     rclpy.init(args=args)
     node = ImageSubscriber()
@@ -46,6 +46,5 @@ def main(args=None):
         cv2.destroyAllWindows()
         rclpy.shutdown()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

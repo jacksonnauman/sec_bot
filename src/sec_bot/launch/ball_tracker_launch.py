@@ -6,11 +6,12 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import PythonExpression
 from launch.actions import DeclareLaunchArgument
+from ament_index_python.packages import get_package_prefix
 
 
 def generate_launch_description():
 
-    my_package_name = "articubot_one"
+    my_package_name = "sec_bot"
     sim_mode = LaunchConfiguration("sim_mode")
     sim_mode_dec = DeclareLaunchArgument("sim_mode", default_value="false")
 
@@ -43,7 +44,7 @@ def generate_launch_description():
                 os.path.join(
                     get_package_share_directory("ball_tracker"),
                     "launch",
-                    "ball_tracker.launch.py",
+                    "sim_cam.launch.py",
                 )
             ]
         ),

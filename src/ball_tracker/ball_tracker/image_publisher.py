@@ -11,6 +11,8 @@ from lifecycle_msgs.msg import Transition
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from std_srvs.srv import Trigger
+from rcl_interfaces.msg import ParameterDescriptor, FloatingPointRange, IntegerRange
+
 
 
 class ImagePublisher(LifecycleNode):
@@ -30,31 +32,49 @@ class ImagePublisher(LifecycleNode):
         self.configured = False
 
         # parameter declarations with validation ranges
+        publish_range = FloatingPointRange()
+        publish_range.from_value = 1.0
+        publish_range.to_value = 60.0
+        publish_range.step = 1.0
+        
         self.declare_parameter(
             "publish_rate",
             30.0,
-            Parameter.Descriptor(
+            ParameterDescriptor(
                 type=Parameter.Type.DOUBLE,
-                floating_point_range=[Parameter.FloatingPointRange(1.0, 60.0, 1.0)],
+                floating_point_range=[publish_range],
             ),
         )
+        
         self.declare_parameter(
-            "image_path", "", Parameter.Descriptor(type=Parameter.Type.STRING)
+            "image_path", "", ParameterDescriptor(type=Parameter.Type.STRING)
         )
+        
+        camera_range = IntegerRange()
+        camera_range.from_value = 0
+        camera_range.to_value = 16
+        camera_range.step = 1
+        
         self.declare_parameter(
             "camera_index",
             0,
-            Parameter.Descriptor(
+            ParameterDescriptor(
                 type=Parameter.Type.INTEGER,
-                integer_range=[Parameter.IntegerRange(0, 16, 1)],
+                integer_range=[camera_range],
             ),
         )
+        
+        width_range = IntegerRange()
+        width_range.from_value = -1
+        width_range.to_value = 7680
+        width_range.step = 1
+        
         self.declare_parameter(
             "resize_width",
             -1,
-            Parameter.Descriptor(
+            ParameterDescriptor(
                 type=Parameter.Type.INTEGER,
-                integer_range=[Parameter.IntegerRange(-1, 7680, 1)],
+                integer_range=[width_range],
             ),
         )
 
@@ -62,6 +82,14 @@ class ImagePublisher(LifecycleNode):
         self.restart_service = self.create_service(
             Trigger, "~/restart", self.restart_callback, callback_group=self.cb_group
         )
+        
+    def process_frame(self, frame):
+        """Process frame with optional resizing"""
+        if self.resize_width > 0:
+            h, w = frame.shape[:2]
+            new_h = int(h * (self.resize_width / w))
+            return cv2.resize(frame, (self.resize_width, new_h))
+        return frame
 
     def restart_callback(self, request, response):
         """Enhanced restart handler with state safety"""

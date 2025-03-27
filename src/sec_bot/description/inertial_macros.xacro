@@ -4,7 +4,7 @@
   <!-- box inertial macro with explicit origin parameters -->
   <xacro:macro name="inertial_box" 
                params="mass:=1.0 x:=0.1 y:=0.1 z:=0.1 
-                       origin_xyz:=0 0 0 origin_rpy:=0 0 0">
+                       origin_xyz:='0 0 0' origin_rpy:='0 0 0'">
     <inertial>
       <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
       <mass value="${mass}"/>
@@ -19,7 +19,7 @@
   <!-- cylinder inertial macro with explicit origin parameters -->
   <xacro:macro name="inertial_cylinder" 
                params="mass:=1.0 radius:=0.1 length:=0.1 
-                       origin_xyz:=0 0 0 origin_rpy:=0 0 0">
+                       origin_xyz:='0 0 0' origin_rpy:='0 0 0'">
     <inertial>
       <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
       <mass value="${mass}"/>
@@ -32,5 +32,16 @@
       />
     </inertial>
   </xacro:macro>
+
+  <!-- sphere inertial macro with explicit origin parameters -->
+  <xacro:macro name="inertial_sphere" params="mass radius *origin">
+      <inertial>
+          <xacro:insert_block name="origin"/>
+          <mass value="${mass}" />
+          <inertia ixx="${(2/5) * mass * (radius*radius)}" ixy="0.0" ixz="0.0"
+                  iyy="${(2/5) * mass * (radius*radius)}" iyz="0.0"
+                  izz="${(2/5) * mass * (radius*radius)}" />
+      </inertial>
+  </xacro:macro>  
 
 </robot>
